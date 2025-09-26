@@ -1,0 +1,63 @@
+http:
+  routers:
+    session-1:
+      rule: "PathPrefix(`/session-1`)"
+      service: session-1
+      middlewares:
+        - strip-session-1
+      entryPoints:
+        - web
+
+    session-1-assets:
+      rule: "PathRegexp(`\\.(css|js|png|jpg|woff2?)$`)"
+      entryPoints:
+        - web
+      service: session-1
+
+    session-2:
+      rule: "PathPrefix(`/session-2`)"
+      service: session-2
+      middlewares:
+        - strip-session-2
+      entryPoints:
+        - web
+
+    session-2-sessions:
+      rule: "PathPrefix(`/session`)"
+      service: session-2
+      entryPoints:
+        - web
+
+    session-2-static:
+      rule: "PathPrefix(`/static`)"
+      service: session-2
+      entryPoints:
+        - web
+
+    session-2-assets:
+      rule: "PathRegexp(`\\.(css|js|png|jpg|woff2?)$`)"
+      entryPoints:
+        - web
+      service: session-2
+
+  middlewares:
+    strip-session-1:
+      stripPrefix:
+        prefixes:
+          - "/session-1"
+    strip-session-2:
+      stripPrefix:
+        prefixes:
+          - "/session-2"
+
+  services:
+    session-1:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:3838"
+
+    session-2:
+      loadBalancer:
+        servers:
+          - url: "http://host.docker.internal:3839"
+

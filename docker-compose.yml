@@ -1,0 +1,84 @@
+version: '3.8'
+
+services:
+  traefik:
+    image: traefik:v3.0
+    ports:
+      - "8081:8081"    # For your router
+    volumes:
+      - ./traefik/:/etc/traefik/
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  db:
+    image: postgres:15
+    environment:
+      POSTGRES_DB: ${FACETS_DB_NAME}
+      POSTGRES_USER: ${FACETS_DB_USERNAME}
+      POSTGRES_PASSWORD: ${FACETS_DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${FACETS_DB_USERNAME} -d ${FACETS_DB_NAME}"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  rabbitmq:
+    image: rabbitmq:3-management
+    environment:
+      RABBITMQ_DEFAULT_USER: ${FACETS_RABBITMQ_USERNAME}
+      RABBITMQ_DEFAULT_PASS: ${FACETS_RABBITMQ_PASSWORD}
+    ports:
+      - "5672:5672"
+      - "15672:15672"  # Management UI
+    volumes:
+      - rabbitmq_data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmqctl", "status"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    environment:
+      - FACETS_SERVICE_SECRET_KEY=${FACETS_SERVICE_SECRET_KEY}
+      - FACETS_DB_NAME=${FACETS_DB_NAME}
+      - FACETS_DB_USERNAME=${FACETS_DB_USERNAME}
+      - FACETS_DB_PASSWORD=${FACETS_DB_PASSWORD}
+      - FACETS_DB_URL=db
+      - FACETS_DB_PORT=${FACETS_DB_PORT}
+      - FACETS_RABBITMQ_URL=rabbitmq:5672
+      - FACETS_RABBITMQ_USERNAME=${FACETS_RABBITMQ_USERNAME}
+      - FACETS_RABBITMQ_PASSWORD=${FACETS_RABBITMQ_PASSWORD}
+      - FACETS_AUTH_LDAP_SERVER_URI=${FACETS_AUTH_LDAP_SERVER_URI}
+      - FACETS_BASE_WORK_DIR=${FACETS_BASE_WORK_DIR}
+      - FACETS_PORT_RANGE=${FACETS_PORT_RANGE}
+      - FACETS_TRAEFIK_CONFIG=${FACETS_TRAEFIK_CONFIG}
+      - FACETS_IMAGE=${FACETS_IMAGE}
+      - FACETS_CONTAINER_PORT=${FACETS_CONTAINER_PORT}
+      - FACETS_TRAEFIK_URL=${FACETS_TRAEFIK_URL}
+    volumes:
+      - ../facetflow_service:/app
+      - ./traefik/:/etc/traefik/
+      - /data1/:/data1/
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      db:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    command: >
+      sh -c "python manage.py migrate && 
+      python manage.py collectstatic --noinput &&
+      gunicorn --bind 0.0.0.0:8080 facetflow_service.wsgi:application"
+
+volumes:
+  postgres_data:
+  rabbitmq_data:
+  facets_work:

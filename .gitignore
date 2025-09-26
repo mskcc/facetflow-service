@@ -1,0 +1,7 @@
+*.pyc
+.idea/
+build/
+staticfiles/
+*.egg-info/
+.env
+.env.sh

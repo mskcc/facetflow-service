@@ -1,0 +1,48 @@
+import logging
+import docker
+from django.conf import settings
+
+"""
+docker run -v $HOME:/root -v /Users/:/Users/ --workdir $2 -p $1:3838 --name $3 --rm  price0416/fp_docker:latest /bin/bash
+"""
+
+class FacetsApp(object):
+
+    logger = logging.getLogger(__name__)
+
+    def __init__(self, session_id, port, work_dir, facets_image=settings.FACETS_IMAGE,
+                 container_port=settings.FACETS_CONTAINER_PORT, base_work_dir=settings.BASE_WORK_DIR):
+        self.session_id = session_id
+        self.port = port
+        self.work_dir = work_dir
+        self.facets_image = facets_image
+        self.container_port = container_port
+        self.base_work_dir = base_work_dir
+
+    def start(self):
+        client = docker.from_env()
+        ports = {
+            self.container_port: self.port
+        }
+        volumes = {
+            settings.BASE_WORK_DIR: {
+                "bind": self.base_work_dir,
+                "mode": "rw"
+            }
+        }
+        container = client.containers.run(
+            image=settings.FACETS_IMAGE,
+            name=self.session_id,
+            ports=ports,
+            volumes=volumes,
+            working_dir=self.work_dir,
+            detach=True
+        )
+        print(f"Container started: {container.id}")
+        return container
+
+    def stop(self):
+        client = docker.from_env()
+        container = client.containers.get(self.session_id)
+        container.stop()
+        container.remove()

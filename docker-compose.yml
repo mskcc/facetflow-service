@@ -67,7 +67,7 @@ services:
       - FACETS_ALLOWED_HOSTS=${FACETS_ALLOWED_HOSTS}
       - FACETS_CORS_ALLOWED_ORIGINS=${FACETS_CORS_ALLOWED_ORIGINS}
     volumes:
-      - ../facetflow_service:/app
+      - ../facetflow-service:/app
       - ./traefik/:/etc/traefik/
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:

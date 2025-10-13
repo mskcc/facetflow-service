@@ -10,7 +10,7 @@ class FacetsApp(object):
 
     logger = logging.getLogger(__name__)
 
-    def __init__(self, session_id, port, work_dir, facets_image=settings.FACETS_IMAGE,
+    def __init__(self, session_id, port, work_dir, username, facets_image=settings.FACETS_IMAGE,
                  container_port=settings.FACETS_CONTAINER_PORT, base_work_dir=settings.BASE_WORK_DIR):
         self.session_id = session_id
         self.port = port
@@ -18,6 +18,7 @@ class FacetsApp(object):
         self.facets_image = facets_image
         self.container_port = container_port
         self.base_work_dir = base_work_dir
+        self.username = username
 
     def start(self):
         client = docker.from_env()
@@ -25,16 +26,29 @@ class FacetsApp(object):
             self.container_port: self.port
         }
         volumes = {
-            settings.BASE_WORK_DIR: {
+            self.base_work_dir: {
                 "bind": self.base_work_dir,
                 "mode": "rw"
             }
         }
+        environment = [
+            'FP_MODE=vm',
+            f'FP_USER_ID={self.username}',
+            f'FP_USER_BASE_WORKDIR={self.base_work_dir}',
+            f'FP_USER_WORKDIR={self.work_dir}'
+        ]
+        mount_points = settings.MOUNT_POINTS.split(",")
+        for mount_point in mount_points:
+            volumes[mount_point] = {
+                "bind": mount_point,
+                "mode": "rw"
+            }
         container = client.containers.run(
             image=settings.FACETS_IMAGE,
             name=self.session_id,
             ports=ports,
             volumes=volumes,
+            environment=environment,
             working_dir=self.work_dir,
             detach=True
         )

@@ -28,7 +28,7 @@ SECRET_KEY = os.environ.get("FACETS_SERVICE_SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["127.0.0.1", "localhost"]
+ALLOWED_HOSTS = os.environ.get("FACETS_ALLOWED_HOSTS").split(",")
 
 # Logging configuration
 LOGGING = {
@@ -77,10 +77,7 @@ INSTALLED_APPS = [
     'django_dramatiq',
 ]
 
-CORS_ALLOWED_ORIGINS = [
-      "http://localhost:8082",
-      "http://127.0.0.1:8082",
-]
+CORS_ALLOWED_ORIGINS = os.environ.get("FACETS_CORS_ALLOWED_ORIGINS").split(",")
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -273,7 +270,8 @@ DRAMATIQ_TASKS_DATABASE = "default"
 
 # Session config
 
-BASE_WORK_DIR = os.environ.get("FACETS_BASE_WORK_DIR", [])
+BASE_WORK_DIR = os.environ.get("FACETS_BASE_WORK_DIR")
+MOUNT_POINTS = os.environ.get("FACETS_MOUNT_POINTS", "")
 PORT_RANGE = os.environ.get("FACETS_PORT_RANGE")
 TRAEFIK_CONFIG = os.environ.get("FACETS_TRAEFIK_CONFIG")
 FACETS_IMAGE = os.environ.get("FACETS_IMAGE")

@@ -42,8 +42,8 @@ class FacetsApp(object):
             'FP_MODE=vm',
             f'FP_USER_ID={self.username}',
             f'FP_USER_BASE_WORKDIR={self.base_work_dir}',
-            f'FP_USER_WORKDIR={self.work_dir}'
-            f'FP_ACCESS_LEVEL={AccessLevel(user.userprofile.access_level).name}',
+            f'FP_USER_WORKDIR={self.work_dir}',
+            f'FP_ACCESS_LEVEL={AccessLevel(user.userprofile.access_level).name}'
         ]
         mount_points = settings.MOUNT_POINTS.split(",")
         for mount_point in mount_points:

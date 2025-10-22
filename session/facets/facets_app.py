@@ -1,6 +1,11 @@
 import logging
 import docker
 from django.conf import settings
+from core.models import AccessLevel
+from django.contrib.auth import get_user_model
+
+
+User = get_user_model()
 
 """
 docker run -v $HOME:/root -v /Users/:/Users/ --workdir $2 -p $1:3838 --name $3 --rm  price0416/fp_docker:latest /bin/bash
@@ -22,6 +27,7 @@ class FacetsApp(object):
 
     def start(self):
         client = docker.from_env()
+        user = User.objects.get(username=self.username)
         ports = {
             self.container_port: self.port
         }
@@ -31,11 +37,13 @@ class FacetsApp(object):
                 "mode": "rw"
             }
         }
+
         environment = [
             'FP_MODE=vm',
             f'FP_USER_ID={self.username}',
             f'FP_USER_BASE_WORKDIR={self.base_work_dir}',
             f'FP_USER_WORKDIR={self.work_dir}'
+            f'FP_ACCESS_LEVEL={AccessLevel(user.userprofile.access_level).name}',
         ]
         mount_points = settings.MOUNT_POINTS.split(",")
         for mount_point in mount_points:

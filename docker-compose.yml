@@ -63,10 +63,12 @@ services:
       - FACETS_IMAGE=${FACETS_IMAGE}
       - FACETS_CONTAINER_PORT=${FACETS_CONTAINER_PORT}
       - FACETS_TRAEFIK_URL=${FACETS_TRAEFIK_URL}
+      - FACETS_MOUNT_POINTS=${FACETS_MOUNT_POINTS}
+      - FACETS_ALLOWED_HOSTS=${FACETS_ALLOWED_HOSTS}
+      - FACETS_CORS_ALLOWED_ORIGINS=${FACETS_CORS_ALLOWED_ORIGINS}
     volumes:
-      - ../facetflow_service:/app
+      - ../facetflow-service:/app
       - ./traefik/:/etc/traefik/
-      - /data1/:/data1/
       - /var/run/docker.sock:/var/run/docker.sock
     depends_on:
       db:

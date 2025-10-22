@@ -47,7 +47,7 @@ def start_session(session_id):
     try:
         port = get_free_port()
         session.port = port
-        facets = FacetsApp(session_id, port, work_directory_path)
+        facets = FacetsApp(session_id, port, work_directory_path, session.owner.username)
         container = facets.start()
     except Exception as e:
         logger.error(e)
@@ -60,7 +60,7 @@ def start_session(session_id):
     start_time = datetime.now()
     session.started_at = start_time
     session.status = SessionStatus.RUNNING
-    session.session_url = urljoin(settings.FACETS_TRAEFIK_URL, session_id)
+    session.session_url = urljoin(settings.FACETS_TRAEFIK_URL, str(session_id))
     session.save(update_fields=["started_at", "status", "session_url"])
 
 def stop_session(session_id):
@@ -70,7 +70,7 @@ def stop_session(session_id):
     """
     session = Session.objects.get(id=session_id)
     try:
-        facets = FacetsApp(session_id, session.port, session.work_directory)
+        facets = FacetsApp(session_id, session.port, session.work_directory, session.owner.username)
         facets.stop()
         session.port = None
         session.save(update_fields=["port"])

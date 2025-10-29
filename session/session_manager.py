@@ -18,7 +18,7 @@ def get_free_port(port_range=settings.PORT_RANGE):
     TODO: Implement lock so two sessions can have the same port
     """
     ports = Session.objects.filter(status=SessionStatus.RUNNING).values_list("port", flat=True)
-    occupied_port_set = (int(p) for p in ports)
+    occupied_port_set = set(int(p) for p in ports)
     start_str, end_str = port_range.split('-')
     start_port = int(start_str.strip())
     end_port = int(end_str.strip())

@@ -45,7 +45,7 @@ class TraefikConfig(object):
 
         router_session_dataobj = deepcopy(ROUTER_SESSION_DATAOBJ)
         router_session_dataobj["service"] = router_session_dataobj["service"].format(session_id=session_id)
-        self.data["http"]["routers"][f"{session_id}-dataobj"] = router_session_assets
+        self.data["http"]["routers"][f"{session_id}-dataobj"] = router_session_dataobj
 
         router_session_static = deepcopy(ROUTER_SESSION_STATIC)
         router_session_static["service"] = router_session_static["service"].format(session_id=session_id)

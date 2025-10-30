@@ -65,10 +65,10 @@ class TraefikConfig(object):
         self.data["http"]["services"][session_id] = service_session
 
     def stop_session(self, session_id):
-        self.data["http"]["routers"].pop(session_id)
-        self.data["http"]["routers"].pop(f"{session_id}-assets")
-        self.data["http"]["routers"].pop(f"{session_id}-dataobj")
-        self.data["http"]["routers"].pop(f"{session_id}-static")
-        self.data["http"]["routers"].pop(f"{session_id}-sessions")
-        self.data["http"]["middlewares"].pop(f"strip-{session_id}")
-        self.data["http"]["services"].pop(session_id)
+        self.data["http"]["routers"].pop(session_id, None)
+        self.data["http"]["routers"].pop(f"{session_id}-assets", None)
+        self.data["http"]["routers"].pop(f"{session_id}-dataobj", None)
+        self.data["http"]["routers"].pop(f"{session_id}-static", None)
+        self.data["http"]["routers"].pop(f"{session_id}-sessions", None)
+        self.data["http"]["middlewares"].pop(f"strip-{session_id}", None)
+        self.data["http"]["services"].pop(session_id, None)

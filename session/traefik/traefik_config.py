@@ -4,6 +4,7 @@ from django.conf import settings
 
 ROUTER_SESSION = {"entryPoints": ["web"], "middlewares": ["strip-{session_id}"], "rule": "PathPrefix(`/{session_id}`)", "service": "{session_id}"}
 ROUTER_SESSION_ASSETS = {"entryPoints": ["web"], "rule": "PathRegexp(`\\.(css|js|png|jpg|woff2?)$`)", 'service': "{session_id}"}
+ROUTER_SESSION_DATAOBJ = {"entryPoints": ["web"], "rule": "PathPrefix(`/dataobj`)", "service": "{session_id}"}
 ROUTER_SESSION_STATIC = {"entryPoints": ["web"], "rule": "PathPrefix(`/static`)", "service": "{session_id}"}
 ROUTER_SESSION_SESSIONS = {"entryPoints": ["web"], "rule": "PathPrefix(`/session`)", "service": "{session_id}"}
 
@@ -37,16 +38,22 @@ class TraefikConfig(object):
         router_session["rule"] = router_session["rule"].format(session_id=session_id)
         router_session["service"] = router_session["service"].format(session_id=session_id)
         self.data["http"]["routers"][session_id] = router_session
+
         router_session_assets = deepcopy(ROUTER_SESSION_ASSETS)
         router_session_assets["service"] = router_session_assets["service"].format(session_id=session_id)
         self.data["http"]["routers"][f"{session_id}-assets"] = router_session_assets
+
+        router_session_dataobj = deepcopy(ROUTER_SESSION_DATAOBJ)
+        router_session_dataobj["service"] = router_session_dataobj["service"].format(session_id=session_id)
+        self.data["http"]["routers"][f"{session_id}-dataobj"] = router_session_assets
+
         router_session_static = deepcopy(ROUTER_SESSION_STATIC)
         router_session_static["service"] = router_session_static["service"].format(session_id=session_id)
         self.data["http"]["routers"][f"{session_id}-static"] = router_session_static
+
         router_session_sessions = deepcopy(ROUTER_SESSION_SESSIONS)
         router_session_sessions["service"] = router_session_sessions["service"].format(session_id=session_id)
         self.data["http"]["routers"][f"{session_id}-sessions"] = router_session_sessions
-        self.data["http"]["routers"][session_id] = router_session
         # Update middleware
         middleware_strip_session = deepcopy(MIDDLEWARE_STRIP_SESSION)
         middleware_strip_session["stripPrefix"]["prefixes"][0] = middleware_strip_session["stripPrefix"]["prefixes"][
@@ -60,6 +67,7 @@ class TraefikConfig(object):
     def stop_session(self, session_id):
         self.data["http"]["routers"].pop(session_id)
         self.data["http"]["routers"].pop(f"{session_id}-assets")
+        self.data["http"]["routers"].pop(f"{session_id}-dataobj")
         self.data["http"]["routers"].pop(f"{session_id}-static")
         self.data["http"]["routers"].pop(f"{session_id}-sessions")
         self.data["http"]["middlewares"].pop(f"strip-{session_id}")

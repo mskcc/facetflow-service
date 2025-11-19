@@ -40,7 +40,7 @@ ROUTER_SESSION_STATIC = {
 
 ROUTER_SESSION_ASSETS = {
     "entryPoints": ["web"],
-    "rule": 'PathRegexp("\\.(css|js|png|jpg|svg|woff2?)$") && HeaderRegexp("Cookie", "ext_uuid_{short_id}=1")',
+    "rule": 'PathRegexp(".(css|js|png|jpg|svg|woff2?)$") && HeaderRegexp("Cookie", "ext_uuid_{short_id}=1")',
     "service": "s-{short_id}",
     "priority": 800
 }

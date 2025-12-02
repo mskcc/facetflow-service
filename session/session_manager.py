@@ -54,13 +54,14 @@ def start_session(session_id):
         raise
     session.container = container.id
     session.save(update_fields=["port","container"])
-    config = TraefikConfig.load()
-    config.start_session(session_id, port)
-    config.dump()
+    # config = TraefikConfig.load()
+    # config.start_session(session_id, port)
+    # config.dump()
     start_time = datetime.now()
     session.started_at = start_time
     session.status = SessionStatus.RUNNING
-    session.session_url = urljoin(settings.FACETS_TRAEFIK_URL, str(session_id))
+
+    session.session_url = f"{settings.FACETS_TRAEFIK_URL}:{str(port)}"
     session.save(update_fields=["started_at", "status", "session_url"])
 
 def stop_session(session_id):

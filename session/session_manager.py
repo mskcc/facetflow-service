@@ -78,9 +78,9 @@ def stop_session(session_id):
     except Exception as e:
         logger.error(e)
         raise
-    config = TraefikConfig.load()
-    config.stop_session(session_id)
-    config.dump()
+    # config = TraefikConfig.load()
+    # config.stop_session(session_id)
+    # config.dump()
     stop_time = datetime.now()
     session.stopped_at = stop_time
     session.status = SessionStatus.STOPPED

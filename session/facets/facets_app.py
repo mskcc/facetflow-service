@@ -59,6 +59,7 @@ class FacetsApp(object):
             environment=environment,
             working_dir=self.work_dir,
             user=f"{settings.FACETS_CONTAINER_USER}:{settings.FACETS_CONTAINER_GROUP}",
+            group_add=settings.FACETS_CONTAINER_ADDITIONAL_GROUPS,
             detach=True
         )
         print(f"Container started: {container.id}")

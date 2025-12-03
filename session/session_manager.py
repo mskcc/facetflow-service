@@ -2,11 +2,9 @@ import os
 import logging
 from datetime import datetime
 from pathlib import Path
-from urllib.parse import urljoin
 from django.conf import settings
 from session.models import Session, SessionStatus
 from session.facets.facets_app import FacetsApp
-from session.traefik.traefik_config import TraefikConfig
 
 
 logger = logging.getLogger(__name__)
@@ -54,9 +52,6 @@ def start_session(session_id):
         raise
     session.container = container.id
     session.save(update_fields=["port","container"])
-    # config = TraefikConfig.load()
-    # config.start_session(session_id, port)
-    # config.dump()
     start_time = datetime.now()
     session.started_at = start_time
     session.status = SessionStatus.RUNNING
@@ -78,9 +73,6 @@ def stop_session(session_id):
     except Exception as e:
         logger.error(e)
         raise
-    # config = TraefikConfig.load()
-    # config.stop_session(session_id)
-    # config.dump()
     stop_time = datetime.now()
     session.stopped_at = stop_time
     session.status = SessionStatus.STOPPED

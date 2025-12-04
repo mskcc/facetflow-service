@@ -43,7 +43,11 @@ class FacetsApp(object):
             f'FP_USER_ID={self.username}',
             f'FP_USER_BASE_WORKDIR={self.base_work_dir}',
             f'FP_USER_WORKDIR={self.work_dir}',
-            f'FP_ACCESS_LEVEL={AccessLevel(user.userprofile.access_level).name}'
+            f'FP_ACCESS_LEVEL={AccessLevel(user.userprofile.access_level).name}',
+            f'FP_IRIS_RSCRIPT={settings.FACETS_IRIS_RSCRIPT}',
+            f'FP_IRIS_WRAPPER={settings.FACETS_IRIS_WRAPPER}',
+            f'FP_IRIS_RLIBS={settings.FACETS_IRIS_RLIBS}',
+            f'FP_IRIS_REFIT_QUEUE={settings.FACETS_IRIS_REFIT_QUEUE}'
         ]
         mount_points = settings.MOUNT_POINTS.split(",")
         for mount_point in mount_points:

@@ -133,16 +133,10 @@ DATABASES = {
 
 # Authentication
 
-AUTH_LDAP_SERVER_URI = os.environ.get("FACETS_AUTH_LDAP_SERVER_URI", "url_goes_here")
-AUTH_LDAP_AUTHORIZE_ALL_USERS = True
-ldap.set_option(ldap.OPT_X_TLS_REQUIRE_CERT, ldap.OPT_X_TLS_NEVER)
-AUTH_LDAP_CONNECTION_OPTIONS = {ldap.OPT_REFERRALS: 1}
-AUTH_LDAP_START_TLS = False
-AUTH_LDAP_CACHE_TIMEOUT = 0
-AUTH_LDAP_USER_DN_TEMPLATE = "%(user)s@mskcc.org"
-AUTH_LDAP_BIND_AS_AUTHENTICATING_USER = True
-AUTH_LDAP_NO_NEW_USERS = False
-AUTH_LDAP_ALWAYS_UPDATE_USER = True
+KEYCLOAK_SERVER_URL = os.environ.get("FACETS_KEYCLOAK_SERVER_URL")
+KEYCLOAK_CLIENT_ID = os.environ.get("FACETS_KEYCLOAK_CLIENT_ID")
+KEYCLOAK_REALM = os.environ.get("FACETS_KEYCLOAK_REALM")
+KEYCLOAK_CLIENT_SECRET = os.environ.get("FACETS_KEYCLOAK_CLIENT_SECRET")
 
 
 AUTH_LDAP_USER_SEARCH = LDAPSearch(
@@ -161,7 +155,7 @@ AUTHENTICATION_BACKENDS = [
 # Django REST Framework settings
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'core.authentication.KeycloakJWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
     ),
     'DEFAULT_PERMISSION_CLASSES': [
